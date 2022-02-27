@@ -6,12 +6,12 @@ const axios = require('axios');
 // Cargar vuelos
 exports.cargar = async (req, res) => {
   // Validate request
-  if (!req.body.title) {
-    res.status(400).send({
-      message: "No puede estar vacio el cuerpo!"
-    });
-    return;
-  }
+  // if (!req.body.title) {
+  //   res.status(400).send({
+  //     message: "No puede estar vacio el cuerpo!"
+  //   });
+  //   return;
+  // }
   // Array de registros para consultar
   const tiposVuelos = [
     { tipo: 'L', aeropuerto: '1' },
@@ -31,7 +31,8 @@ exports.cargar = async (req, res) => {
       idAeropuerto: tipoVuelo.aeropuerto
     });
 
-    if (resultado?.data?.vuelos) {
+    // if (resultado?.data?.vuelos) {
+    if (resultado.data.vuelos) {
       for (const vuelo of resultado.data.vuelos) {
         // consultamos si existe el registro
         const vueloExiste = await Vuelo.findAll({ where: { nroVuelo: parseInt(vuelo.NRO_VUELO[0]) } });
@@ -54,10 +55,12 @@ exports.cargar = async (req, res) => {
         // console.log('::::::::::::::::::::::: datosVuelo:', datosVuelo);
 
         // Insertamos o actualizamos
-        if (vueloExiste[0]?.dataValues.id) {
+        // if (vueloExiste[0]?.dataValues.id) {
+        if (vueloExiste && vueloExiste.lenght >0 && vueloExiste[0].dataValues.id) {
           try {
             await Vuelo.update(datosVuelo, {
-              where: { id: vueloExiste[0]?.dataValues.id }
+              where: { id: vueloExiste[0].dataValues.id }
+              // where: { id: vueloExiste[0]?.dataValues.id }
             })
           } catch (error) {
             return res.status(400).send({

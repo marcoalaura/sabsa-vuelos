@@ -5,7 +5,8 @@ module.exports = app => {
     // router.post("/", vuelos.create);
     router.post("/", vuelos.cargar);
     // Retorna todos los vuelos
-    router.get("/", vuelos.findAll);
+    // router.get("/", vuelos.findAll);
+    router.get("/", vuelos.cargar);
     // Retorna todos los vuelos publicados
     router.get("/published", vuelos.findAllPublished);
     // Retorna a Vuelo segun id
