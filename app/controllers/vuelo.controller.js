@@ -34,50 +34,53 @@ exports.cargar = async (req, res) => {
     // if (resultado?.data?.vuelos) {
     if (resultado.data.vuelos) {
       for (const vuelo of resultado.data.vuelos) {
-        // consultamos si existe el registro
-        const vueloExiste = await Vuelo.findAll({ where: { nroVuelo: parseInt(vuelo.NRO_VUELO[0]) } });
-        // Create a Vuelo
-        const datosVuelo = {
-          idItinerario: parseInt(vuelo.ID_ITINERARIO[0]) || null,
-          fechaHora: vuelo.FECHA_HORA[0],
-          fecha: vuelo.FECHA[0],
-          idEmpresa: vuelo.ID_EMPRESA[0],
-          tipoOperacion: vuelo.TIPO_OPERACION[0],
-          nroVuelo: parseInt(vuelo.NRO_VUELO[0]) || null,
-          horaEstimada: vuelo.HORA_ESTIMADA[0],
-          horaReal: vuelo.HORA_REAL[0],
-          nroPuerta: parseInt(vuelo.NRO_PUERTA[0]) || null,
-          observacion: typeof vuelo.OBSERVACION[0] === 'object' ? JSON.stringify(vuelo.OBSERVACION[0]) : vuelo.OBSERVACION[0],
-          nombreAerolinea: vuelo.NOMBRE_AEROLINEA[0],
-          ruta: vuelo.RUTA[0],
-          aeropuerto: vuelo.AEROPUERTO[0],
-        };
-        // console.log('::::::::::::::::::::::: datosVuelo:', datosVuelo);
+        if (!isNaN(vuelo.NRO_VUELO[0])) {
+          // consultamos si existe el registro
+          const vueloExiste = await Vuelo.findAll({ where: { nroVuelo: parseInt(vuelo.NRO_VUELO[0]) } });
 
-        // Insertamos o actualizamos
-        // if (vueloExiste[0]?.dataValues.id) {
-        if (vueloExiste && vueloExiste.lenght >0 && vueloExiste[0].dataValues.id) {
-          try {
-            await Vuelo.update(datosVuelo, {
-              where: { id: vueloExiste[0].dataValues.id }
-              // where: { id: vueloExiste[0]?.dataValues.id }
-            })
-          } catch (error) {
-            return res.status(400).send({
-              message: "No se pudo actualizar el vuelo"
-            });
+          // Create a Vuelo
+          const datosVuelo = {
+            idItinerario: parseInt(vuelo.ID_ITINERARIO[0]) || null,
+            fechaHora: vuelo.FECHA_HORA[0],
+            fecha: vuelo.FECHA[0],
+            idEmpresa: vuelo.ID_EMPRESA[0],
+            tipoOperacion: vuelo.TIPO_OPERACION[0],
+            nroVuelo: parseInt(vuelo.NRO_VUELO[0]) || null,
+            horaEstimada: vuelo.HORA_ESTIMADA[0],
+            horaReal: vuelo.HORA_REAL[0],
+            nroPuerta: parseInt(vuelo.NRO_PUERTA[0]) || null,
+            observacion: typeof vuelo.OBSERVACION[0] === 'object' ? JSON.stringify(vuelo.OBSERVACION[0]) : vuelo.OBSERVACION[0],
+            nombreAerolinea: vuelo.NOMBRE_AEROLINEA[0],
+            ruta: vuelo.RUTA[0],
+            aeropuerto: vuelo.AEROPUERTO[0],
+          };
+          // console.log('::::::::::::::::::::::: datosVuelo:', datosVuelo);
+
+          // Insertamos o actualizamos
+          // if (vueloExiste[0]?.dataValues.id) {
+          if (vueloExiste && vueloExiste[0]?.dataValues.id) {
+            try {
+              await Vuelo.update(datosVuelo, {
+                where: { id: vueloExiste[0].dataValues.id }
+                // where: { id: vueloExiste[0]?.dataValues.id }
+              })
+            } catch (error) {
+              return res.status(400).send({
+                message: "No se pudo actualizar el vuelo"
+              });
+            }
+            totalActualizados ++;
+          } else {
+            // Save Vuelo in the database
+            try {
+              await Vuelo.create(datosVuelo);
+            } catch (error) {
+              return res.status(400).send({
+                message: "No se pudo registrar el vuelo"
+              });
+            }
+            totalInsertados ++;
           }
-          totalActualizados ++;
-        } else {
-          // Save Vuelo in the database
-          try {
-            await Vuelo.create(datosVuelo);
-          } catch (error) {
-            return res.status(400).send({
-              message: "No se pudo registrar el vuelo"
-            });
-          }
-          totalInsertados ++;
         }
       }
     }
